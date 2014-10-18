@@ -79,6 +79,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Entities\Category.cs" />
+    <Compile Include="Entities\Collection.cs" />
+    <Compile Include="Entities\Comment.cs" />
+    <Compile Include="Entities\Contacts.cs" />
+    <Compile Include="Entities\Equipement.cs" />
+    <Compile Include="Entities\User.cs" />
+    <Compile Include="Entities\Photo.cs" />
+    <Compile Include="Interfaces\IPxService.cs" />
     <Compile Include="Services\PxService.cs" />
     <Compile Include="Interfaces\ISettingsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

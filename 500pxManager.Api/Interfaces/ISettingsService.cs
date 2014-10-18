@@ -10,5 +10,7 @@ namespace _500pxManager.Api.Interfaces
     {
         bool SaveSetting(string name, string value);
         string GetSetting(string name);
+        Task<bool> SaveObjectAsync<T>(T obj) where T : class, new();
+        Task<T> GetObjectAsync<T>() where T : class, new();
     }
 }

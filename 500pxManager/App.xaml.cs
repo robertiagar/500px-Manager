@@ -1,4 +1,6 @@
 ﻿using _500pxManager.Common;
+using _500pxManager.Interfaces;
+using GalaSoft.MvvmLight.Ioc;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,6 +80,8 @@ namespace _500pxManager
 
             if (rootFrame.Content == null)
             {
+                SimpleIoc.Default.Register<INavigationService>(() => { return new NavigationService(rootFrame); });
+
                 // Removes the turnstile navigation for startup.
                 if (rootFrame.ContentTransitions != null)
                 {
@@ -94,7 +98,7 @@ namespace _500pxManager
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))
+                if (!rootFrame.Navigate(typeof(LoginPage), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }

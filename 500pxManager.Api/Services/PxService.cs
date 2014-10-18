@@ -17,10 +17,11 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using System.Net.Http.Headers;
+using _500pxManager.Api.Entities;
 
 namespace _500pxManager.Api.Services
 {
-    public class PxService
+    public class PxService : IPxService
     {
         private const string consumerKey = "nGr9Xrl4hMz5njA64KeOFuJS7u85NwOHSMS8BCAv";
         private const string consumerSecret = "TVJadczaVu0gm479gmbGWe32CoiVaN3Q8MbrfjRS";
@@ -42,16 +43,12 @@ namespace _500pxManager.Api.Services
 
                 var signBuffer = Windows.Security.Cryptography.Core.CryptographicEngine.Sign(cryptKey, dataBuffer);
 
-
-
                 byte[] value;
 
                 Windows.Security.Cryptography.CryptographicBuffer.CopyToByteArray(signBuffer, out value);
 
                 return value;
-
             };
-
 
             this.settings = settings;
         }
@@ -64,9 +61,9 @@ namespace _500pxManager.Api.Services
             return result.Token;
         }
 
-        public async Task LoginAsync()
+        public async Task<bool> LoginAsync()
         {
-            if (GetAccessToken() == null)
+            if (await GetAccessTokenAsync() == null)
             {
                 if (requestToken == null)
                 {
@@ -78,10 +75,14 @@ namespace _500pxManager.Api.Services
                 var authorizeUrl = client.BuildAuthorizeUrl("https://api.500px.com/v1/oauth/authorize", requestToken);
 
                 WebAuthenticationBroker.AuthenticateAndContinue(new Uri(authorizeUrl), new Uri("http://www.robertiagar.com"));
+
+                return true;
             }
+
+            return false;
         }
 
-        public async Task GetAccessTokenAsync(WebAuthenticationResult result)
+        public async Task SaveAccessTokenAsync(WebAuthenticationResult result)
         {
             var client = new OAuthAuthorizer(consumerKey, consumerSecret);
 
@@ -90,17 +91,15 @@ namespace _500pxManager.Api.Services
 
             var accessToken = await client.GetAccessToken("https://api.500px.com/v1/oauth/access_token", requestToken, verifier);
 
-            settings.SaveSetting("accessTokenSecret", accessToken.Token.Secret);
-            settings.SaveSetting("accessTokenKey", accessToken.Token.Key);
+            await settings.SaveObjectAsync<AccessToken>(accessToken.Token);
         }
 
-        private AccessToken GetAccessToken()
+        private async Task<AccessToken> GetAccessTokenAsync()
         {
-            var key = settings.GetSetting("accessTokenKey");
-            var secret = settings.GetSetting("accessTokenSecret");
-            if (key != null && secret != null)
+            var accessToken = await settings.GetObjectAsync<AccessToken>();
+            if (accessToken != null)
             {
-                return new AccessToken(key, secret);
+                return accessToken;
             }
             else
             {
@@ -108,20 +107,34 @@ namespace _500pxManager.Api.Services
             }
         }
 
-        private HttpClient GetOAuthClient()
+        public async Task<bool> HaveAccessTokenAsync()
         {
-            var accessToken = GetAccessToken();
+            var accessToken = await GetAccessTokenAsync();
+            if (accessToken != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private async Task<HttpClient> GetOAuthClientAsync()
+        {
+            var accessToken = await GetAccessTokenAsync();
             return OAuthUtility.CreateOAuthClient(consumerKey, consumerSecret, accessToken);
         }
 
-        public async Task GetUserAsync()
+        public async Task<User> GetUserAsync()
         {
-            var client = GetOAuthClient();
+            var client = await GetOAuthClientAsync();
 
             var result = await client.GetStringAsync("https://api.500px.com/v1/users");
 
-            Windows.UI.Popups.MessageDialog dialog = new Windows.UI.Popups.MessageDialog(result);
-            await dialog.ShowAsync();
+            var user = JsonConvert.DeserializeObject<UserRoot>(result);
+
+            return user.User;
         }
 
         public async Task UploadPhotosAsync(IEnumerable<StorageFile> files, Action<UploadOperation> progressAction)
@@ -136,7 +149,7 @@ namespace _500pxManager.Api.Services
         {
             var uri = string.Format("https://api.500px.com/v1/photos/upload?name={0}&description={1}&privacy=1&category=0", "test name", "test description");
             var backgroudUploader = new BackgroundUploader();
-            var headers = OAuthUtility.BuildBasicParameters(consumerKey, consumerSecret, uri, HttpMethod.Post, GetAccessToken());
+            var headers = OAuthUtility.BuildBasicParameters(consumerKey, consumerSecret, uri, HttpMethod.Post, await GetAccessTokenAsync());
             var header = string.Empty;
             foreach (var item in headers)
             {

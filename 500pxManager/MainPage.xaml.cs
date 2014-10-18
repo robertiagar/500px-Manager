@@ -1,10 +1,13 @@
-﻿using System;
+﻿using _500pxManager.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -12,98 +15,97 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using _500pxManager.Api;
-using System.Diagnostics;
-using Windows.ApplicationModel.Activation;
-using Windows.Security.Authentication.Web;
-using _500pxManager.Api.Services;
-using Windows.Storage.Pickers;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
+// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
 namespace _500pxManager
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page, IWebAuthenticationContinuable, IFileOpenPickerContinuable
+    public sealed partial class MainPage : Page
     {
-        private PxService pxService;
+        private NavigationHelper navigationHelper;
+        private ObservableDictionary defaultViewModel = new ObservableDictionary();
+
         public MainPage()
         {
             this.InitializeComponent();
 
-            this.NavigationCacheMode = NavigationCacheMode.Required;
-
-            pxService = new PxService(new SettingsService());
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
+            this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
         }
 
         /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
+        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
         /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.
-        /// This parameter is typically used to configure the page.</param>
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        public NavigationHelper NavigationHelper
         {
-            // TODO: Prepare page for display here.
-
-            // TODO: If your application contains multiple pages, ensure that you are
-            // handling the hardware Back button by registering for the
-            // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
-            // If you are using the NavigationHelper provided by some templates,
-            // this event is handled for you.
-
-            await pxService.LoginAsync();
+            get { return this.navigationHelper; }
         }
 
-        public async void ContinueWebAuthentication(WebAuthenticationBrokerContinuationEventArgs args)
+        /// <summary>
+        /// Gets the view model for this <see cref="Page"/>.
+        /// This can be changed to a strongly typed view model.
+        /// </summary>
+        public ObservableDictionary DefaultViewModel
         {
-            WebAuthenticationResult result = args.WebAuthenticationResult;
-
-            await pxService.GetAccessTokenAsync(result);
-
-            await pxService.GetUserAsync();
-
-
-            if (result.ResponseStatus == WebAuthenticationStatus.Success)
-            {
-                Debug.WriteLine(result.ResponseData.ToString());
-            }
-            else if (result.ResponseStatus == WebAuthenticationStatus.ErrorHttp)
-            {
-                Debug.WriteLine("HTTP Error returned by AuthenticateAsync() : " + result.ResponseErrorDetail.ToString());
-            }
-            else
-            {
-                Debug.WriteLine("Error returned by AuthenticateAsync() : " + result.ResponseStatus.ToString());
-            }
+            get { return this.defaultViewModel; }
         }
 
-        public async void ContinueFileOpenPicker(FileOpenPickerContinuationEventArgs args)
+        /// <summary>
+        /// Populates the page with content passed during navigation.  Any saved state is also
+        /// provided when recreating a page from a prior session.
+        /// </summary>
+        /// <param name="sender">
+        /// The source of the event; typically <see cref="NavigationHelper"/>
+        /// </param>
+        /// <param name="e">Event data that provides both the navigation parameter passed to
+        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
+        /// a dictionary of state preserved by this page during an earlier
+        /// session.  The state will be null the first time a page is visited.</param>
+        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-
-            var result = args.Files.First();
-
-            await pxService.UploadPhotoAsync(result, op =>
-            {
-                Debug.WriteLine(op.Progress.BytesSent);
-            });
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Preserves state associated with this page in case the application is suspended or the
+        /// page is discarded from the navigation cache.  Values must conform to the serialization
+        /// requirements of <see cref="SuspensionManager.SessionState"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
+        /// <param name="e">Event data that provides an empty dictionary to be populated with
+        /// serializable state.</param>
+        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
-            UploadPhoto();
         }
 
-        private void UploadPhoto()
-        {
+        #region NavigationHelper registration
 
-            FileOpenPicker picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
-            picker.PickSingleFileAndContinue();
+        /// <summary>
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// <para>
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="NavigationHelper.LoadState"/>
+        /// and <see cref="NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+        /// </para>
+        /// </summary>
+        /// <param name="e">Provides data for navigation methods and event
+        /// handlers that cannot cancel the navigation request.</param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            this.navigationHelper.OnNavigatedTo(e);
         }
 
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            this.navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _500pxManager.Api.Entities
 {
-    enum Category
+    public enum Category
     {
         Uncategorized = 0,
         Abstract = 10,
