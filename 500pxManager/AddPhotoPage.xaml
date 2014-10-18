@@ -1,0 +1,61 @@
+﻿<Page
+    x:Class="_500pxManager.AddPhotoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:_500pxManager"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding AddPhoto, Source={StaticResource Locator}}">
+
+    <Grid x:Name="LayoutRoot">
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Panel -->
+        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+            <TextBlock Text="{StaticResource AppName}" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
+            <TextBlock Text="add photo" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+        </StackPanel>
+
+        <!--TODO: Content should be placed within the following grid-->
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Name"/>
+                <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"/>
+                <ComboBox Grid.Row="2" ItemsSource="{Binding PrivacyOptions}"
+                              SelectedItem="{Binding SelectedPrivacy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
+                              Header="Private"/>
+                <ComboBox Grid.Row="3" ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
+                              Header="Category"/>
+                <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Button Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Label="upload" Icon="Upload" Command="{Binding UploadPhotoCommand}"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

@@ -141,13 +141,13 @@ namespace _500pxManager.Api.Services
         {
             foreach (var file in files)
             {
-                await UploadPhotoAsync(file, progressAction);
+                await Task.Delay(0);
             }
         }
 
-        public async Task UploadPhotoAsync(StorageFile file, Action<UploadOperation> progressAction)
+        public async Task UploadPhotoAsync(IStorageFile file, Action<UploadOperation> progressAction, string name, string description, Privacy privacy, Category category)
         {
-            var uri = string.Format("https://api.500px.com/v1/photos/upload?name={0}&description={1}&privacy=1&category=0", "test name", "test description");
+            var uri = string.Format("https://api.500px.com/v1/photos/upload?name={0}&description={1}&privacy={2}&category={3}", name, description, (int)privacy, (int)category);
             var backgroudUploader = new BackgroundUploader();
             var headers = OAuthUtility.BuildBasicParameters(consumerKey, consumerSecret, uri, HttpMethod.Post, await GetAccessTokenAsync());
             var header = string.Empty;
@@ -180,6 +180,12 @@ namespace _500pxManager.Api.Services
             {
                 Debug.WriteLine(ex.Message);
             }
+        }
+
+
+        public async Task AddCollectionAsync(string CollectionName)
+        {
+            var client = await GetOAuthClientAsync();
         }
     }
 }

@@ -24,11 +24,11 @@ namespace _500pxManager
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class AddPhotoPage : Page, IFileOpenPickerContinuable
     {
         private NavigationHelper navigationHelper;
 
-        public MainPage()
+        public AddPhotoPage()
         {
             this.InitializeComponent();
 
@@ -49,9 +49,9 @@ namespace _500pxManager
         /// Gets the view model for this <see cref="Page"/>.
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public MainViewModel MainViewModel
+        public AddPhotoViewModel DefaultViewModel
         {
-            get { return this.DataContext as MainViewModel; }
+            get { return this.DataContext as AddPhotoViewModel; }
         }
 
         /// <summary>
@@ -108,17 +108,10 @@ namespace _500pxManager
 
         #endregion
 
-        private void pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public async void ContinueFileOpenPicker(Windows.ApplicationModel.Activation.FileOpenPickerContinuationEventArgs args)
         {
-            switch (((Pivot)sender).SelectedIndex)
-            {
-                case 0:
-                    this.BottomAppBar = (CommandBar)App.Current.Resources["AddCollectionAppBar"];
-                    break;
-                case 1:
-                    this.BottomAppBar = (CommandBar)App.Current.Resources["AddPhotoAppBar"];
-                    break;
-            }
+            var file = args.Files.First();
+            await DefaultViewModel.SetFileAsync(file);
         }
     }
 }

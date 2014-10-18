@@ -14,7 +14,7 @@ namespace _500pxManager.Api.Interfaces
         Task SaveAccessTokenAsync(WebAuthenticationResult result);
         Task<User> GetUserAsync();
         Task<bool> LoginAsync();
-        Task UploadPhotoAsync(StorageFile file, Action<UploadOperation> progressAction);
+        Task UploadPhotoAsync(IStorageFile file, Action<UploadOperation> progressAction, string name, string description, Privacy privacy, Category category);
         Task UploadPhotosAsync(IEnumerable<StorageFile> files, Action<UploadOperation> progressAction);
         Task<bool> HaveAccessTokenAsync();
     }

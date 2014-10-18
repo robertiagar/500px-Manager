@@ -46,8 +46,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Style="{StaticResource BodyTextBlockStyle}"
-                       CommonNavigationTransitionInfo.IsStaggerElement="True"
-                       ContinuumNavigationTransitionInfo.IsExitElement="True">
+                       CommonNavigationTransitionInfo.IsStaggerElement="True">
                 Welcome to 500px Manager! In order to use the application you need to login. You can do that by clicking the Login button below.
             </TextBlock>
             <Button Grid.Row="1" 

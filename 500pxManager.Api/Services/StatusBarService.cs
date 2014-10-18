@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _500pxManager.Api.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,20 +11,21 @@ using Windows.UI.Xaml.Media;
 
 namespace _500pxManager.Api.Services
 {
-    public class StatusBarService
+    public class StatusBarService : IStatusBarService
     {
         private StatusBar statusBar;
+
         public StatusBarService()
         {
             statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
-        }
-
-        public StatusBarService(Color color)
-        {
-            statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
-            statusBar.BackgroundColor = color;
             statusBar.BackgroundOpacity = 1;
         }
+
+        //public StatusBarService(Color color)
+        //{
+        //    statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
+        //    statusBar.BackgroundColor = color;
+        //}
 
         public void DisplayProgress(double? progress, string message = null)
         {
@@ -47,6 +49,7 @@ namespace _500pxManager.Api.Services
         public async Task HideProgressAsync()
         {
             await statusBar.ProgressIndicator.HideAsync();
+            statusBar.ProgressIndicator.ProgressValue = null;
         }
     }
 }
