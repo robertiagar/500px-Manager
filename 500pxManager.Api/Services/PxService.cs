@@ -152,8 +152,16 @@ namespace _500pxManager.Api.Services
 
             backgroudUploader.SetRequestHeader("Authorization", string.Format("OAuth {0}", header));
             backgroudUploader.SetRequestHeader("Filename", file.Name);
+            string boundary = "----------------------------" + DateTime.Now.Ticks.ToString("x");
+            backgroudUploader.SetRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+            backgroudUploader.Method = "POST";
 
-            var op = backgroudUploader.CreateUpload(new Uri(uri), file);
+            var parts = new List<BackgroundTransferContentPart>();
+            var part = new BackgroundTransferContentPart();
+            part.SetFile(file);
+            parts.Add(part);
+
+            var op = await backgroudUploader.CreateUploadAsync(new Uri(uri), parts, "", boundary);
             try
             {
                 var result = await op.StartAsync();
