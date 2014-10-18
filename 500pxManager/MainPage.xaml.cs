@@ -17,6 +17,7 @@ using System.Diagnostics;
 using Windows.ApplicationModel.Activation;
 using Windows.Security.Authentication.Web;
 using _500pxManager.Api.Services;
+using Windows.Storage.Pickers;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -33,7 +34,7 @@ namespace _500pxManager
             this.InitializeComponent();
 
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            
+
             pxService = new PxService(new SettingsService());
         }
 
@@ -80,14 +81,29 @@ namespace _500pxManager
 
         public async void ContinueFileOpenPicker(FileOpenPickerContinuationEventArgs args)
         {
-            var result = args.Files;
 
-            await pxService.UploadPhotoContinueAsync(result);
+            var result = args.Files.First();
+
+            await pxService.UploadPhotoAsync(result, op =>
+            {
+                Debug.WriteLine(op.Progress.BytesSent);
+            });
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            pxService.UploadPhoto();
+            UploadPhoto();
         }
+
+        private void UploadPhoto()
+        {
+
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.PickSingleFileAndContinue();
+        }
+
     }
 }

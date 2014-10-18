@@ -124,25 +124,20 @@ namespace _500pxManager.Api.Services
             await dialog.ShowAsync();
         }
 
-        public void UploadPhoto()
+        public async Task UploadPhotosAsync(IEnumerable<StorageFile> files, Action<UploadOperation> progressAction)
         {
-
-            FileOpenPicker picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
-            picker.PickSingleFileAndContinue();
-
-
+            foreach (var file in files)
+            {
+                await UploadPhotoAsync(file, progressAction);
+            }
         }
 
-        public async Task UploadPhotoContinueAsync(IEnumerable<StorageFile> files)
+        public async Task UploadPhotoAsync(StorageFile file, Action<UploadOperation> progressAction)
         {
-            var uri = string.Format("https://api.500px.com/v1/photos/upload?name={0}&description={1}&privacy=0&category=0", "test name", "test description");
+            var uri = string.Format("https://api.500px.com/v1/photos/upload?name={0}&description={1}&privacy=1&category=0", "test name", "test description");
             var backgroudUploader = new BackgroundUploader();
             var headers = OAuthUtility.BuildBasicParameters(consumerKey, consumerSecret, uri, HttpMethod.Post, GetAccessToken());
             var header = string.Empty;
-            var file = files.First();
             foreach (var item in headers)
             {
                 header += string.Format(@"{0}=""{1}"", ", item.Key, item.Value);
@@ -158,13 +153,15 @@ namespace _500pxManager.Api.Services
 
             var parts = new List<BackgroundTransferContentPart>();
             var part = new BackgroundTransferContentPart();
+            part.SetHeader("Content-Disposition", @"form-data; name=""file""; filename=""" + file.Name + "\"");
             part.SetFile(file);
             parts.Add(part);
 
             var op = await backgroudUploader.CreateUploadAsync(new Uri(uri), parts, "", boundary);
             try
             {
-                var result = await op.StartAsync();
+                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(progressAction);
+                var result = await op.StartAsync().AsTask(progressCallback);
             }
             catch (Exception ex)
             {
