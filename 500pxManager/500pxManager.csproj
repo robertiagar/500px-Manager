@@ -112,6 +112,10 @@
     <Compile Include="ViewModel\AddPhotoViewModel.cs" />
     <Compile Include="ViewModel\PhotoViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModel\ViewPhotoViewModel.cs" />
+    <Compile Include="ViewPhotoPaage.xaml.cs">
+      <DependentUpon>ViewPhotoPaage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -142,6 +146,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewPhotoPaage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

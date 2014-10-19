@@ -67,7 +67,8 @@
                 <ListView
                     IsItemClickEnabled="True"
                     ContinuumNavigationTransitionInfo.ExitElementContainer="True"
-                    ItemsSource="{Binding Photos}">
+                    ItemsSource="{Binding Photos}"
+                    ItemClick="ListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -77,12 +78,13 @@
                                 </Grid.ColumnDefinitions>
                                 <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Height="100">
                                     <Grid>
-                                        <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Photo.name}"/>
+                                        <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Photo.name}" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
                                     </Grid>
                                 </Border>
                                 <StackPanel Grid.Column="1" Margin="5">
-                                    <TextBlock Text="{Binding Photo.name}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="WrapWholeWords"/>
-                                    <TextBlock Text="{Binding Photo.Category}" Style="{StaticResource BodyTextBlockStyle}" MaxHeight="60"/>
+                                    <TextBlock Text="{Binding Photo.name}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="WrapWholeWords" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                                    <TextBlock Text="{Binding Photo.Category}" Style="{StaticResource BodyTextBlockStyle}" MaxHeight="60" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                                    <TextBlock Text="{Binding Photo.rating}" Style="{StaticResource BodyTextBlockStyle}" MaxHeight="60" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
                                 </StackPanel>
                             </Grid>
                         </DataTemplate>

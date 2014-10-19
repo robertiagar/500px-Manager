@@ -47,6 +47,7 @@ namespace _500pxManager.ViewModel
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<LoginViewModel>();
             SimpleIoc.Default.Register<AddPhotoViewModel>();
+            SimpleIoc.Default.Register<ViewPhotoViewModel>();
             SimpleIoc.Default.Register<IPxService, PxService>();
             SimpleIoc.Default.Register<ISettingsService, SettingsService>();
             SimpleIoc.Default.Register<IStatusBarService, StatusBarService>();
@@ -73,6 +74,14 @@ namespace _500pxManager.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<AddPhotoViewModel>();
+            }
+        }
+
+        public ViewPhotoViewModel ViewPhoto
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ViewPhotoViewModel>();
             }
         }
         

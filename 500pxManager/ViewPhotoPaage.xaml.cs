@@ -1,4 +1,5 @@
-﻿using _500pxManager.Common;
+﻿using _500pxManager.Api.Entities;
+using _500pxManager.Common;
 using _500pxManager.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,11 @@ namespace _500pxManager
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class ViewPhotoPaage : Page
     {
         private NavigationHelper navigationHelper;
 
-        public MainPage()
+        public ViewPhotoPaage()
         {
             this.InitializeComponent();
 
@@ -49,9 +50,9 @@ namespace _500pxManager
         /// Gets the view model for this <see cref="Page"/>.
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public MainViewModel MainViewModel
+        public ViewPhotoViewModel ViewPhotoViewModel
         {
-            get { return this.DataContext as MainViewModel; }
+            get { return this.DataContext as ViewPhotoViewModel; }
         }
 
         /// <summary>
@@ -65,9 +66,9 @@ namespace _500pxManager
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            await MainViewModel.GetPhotosAsync();
+            ViewPhotoViewModel.SetPhoto(e.NavigationParameter as Photo);
         }
 
         /// <summary>
@@ -108,24 +109,5 @@ namespace _500pxManager
         }
 
         #endregion
-
-        private void pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            switch (((Pivot)sender).SelectedIndex)
-            {
-                case 0:
-                    this.BottomAppBar = (CommandBar)App.Current.Resources["AddCollectionAppBar"];
-                    break;
-                case 1:
-                    this.BottomAppBar = (CommandBar)App.Current.Resources["AddPhotoAppBar"];
-                    break;
-            }
-        }
-
-        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            var pvm = e.ClickedItem as PhotoViewModel;
-            MainViewModel.NavigateToItemDetails(pvm.Photo);
-        }
     }
 }

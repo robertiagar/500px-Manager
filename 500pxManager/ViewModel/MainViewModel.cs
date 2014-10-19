@@ -36,6 +36,14 @@ namespace _500pxManager.ViewModel
             this.photos = new ObservableCollection<PhotoViewModel>();
             this.pxService = pxService;
             this.statusBarService = statusBarService;
+            MessengerInstance.Register<int>(this, id =>
+            {
+                var photo = Photos.Where(p => p.Photo.id == id).SingleOrDefault();
+                if (photo != null)
+                {
+                    photos.Remove(photo);
+                }
+            });
         }
 
         public int SelectedIndex
@@ -122,13 +130,18 @@ namespace _500pxManager.ViewModel
                 foreach (var photo in photos)
                 {
                     var exists = Photos.Any(p => p.Photo.id == photo.id);
+                    var photoViewModel = new PhotoViewModel(photo);
                     if (!exists)
                     {
-                        var photoViewModel = new PhotoViewModel(photo);
                         var list = Photos.ToList();
                         int index = list.BinarySearch(photoViewModel);
                         int insertIndex = ~index;
                         Photos.Insert(insertIndex, photoViewModel);
+                    }
+                    if (exists)
+                    {
+                        var pvm = Photos.Where(p => p.Photo.id == photo.id).SingleOrDefault();
+                        pvm.Photo = photo;
                     }
                 }
 
@@ -136,13 +149,18 @@ namespace _500pxManager.ViewModel
                 foreach (var photo in photos)
                 {
                     var exists = Photos.Any(p => p.Photo.id == photo.id);
+                    var photoViewModel = new PhotoViewModel(photo);
                     if (!exists)
                     {
-                        var photoViewModel = new PhotoViewModel(photo);
                         var list = Photos.ToList();
                         int index = list.BinarySearch(photoViewModel);
                         int insertIndex = ~index;
                         Photos.Insert(insertIndex, photoViewModel);
+                    }
+                    if (exists)
+                    {
+                        var pvm = Photos.Where(p => p.Photo.id == photo.id).SingleOrDefault();
+                        pvm.Photo = photo;
                     }
                 }
                 await statusBarService.DisplayMessage("Done!", 3000, false);
@@ -170,6 +188,11 @@ namespace _500pxManager.ViewModel
             }
 
             return true;
+        }
+
+        public void NavigateToItemDetails(Api.Entities.Photo photo)
+        {
+            navigationService.Navigate(typeof(ViewPhotoPaage), photo);
         }
     }
 }

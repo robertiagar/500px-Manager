@@ -188,7 +188,7 @@ namespace _500pxManager.Api.Services
             var client = await GetOAuthClientAsync();
             var user = await GetUserAsync();
 
-            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, 2);
+            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}&tags=1", user.username, 2);
             var json = await client.GetStringAsync(uri);
 
             JObject jsonResult = JObject.Parse(json);
@@ -201,7 +201,7 @@ namespace _500pxManager.Api.Services
             photosResult.AddRange(photos);
             for (currentPage = 3; currentPage < pages; currentPage++)
             {
-                uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, currentPage);
+                uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}&tags=1", user.username, currentPage);
                 json = await client.GetStringAsync(uri);
 
                 jsonResult = JObject.Parse(json);
@@ -218,7 +218,7 @@ namespace _500pxManager.Api.Services
             var client = await GetOAuthClientAsync();
             var user = await GetUserAsync();
 
-            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, 1);
+            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}&tags=1", user.username, 1);
             var json = await client.GetStringAsync(uri);
 
             JObject jsonResult = JObject.Parse(json);
@@ -232,10 +232,26 @@ namespace _500pxManager.Api.Services
             return photosResult;
         }
 
-
-        public async Task<IEnumerable<Photo>> RefreshPhotosAsync()
+        public async Task<bool> UpdatePhotoAsync(int id, string name, string description, string tags, Category selectedCategory, Privacy selectedPrivacy)
         {
-            return await GetFirstPhotosPageForUserAsync();
+            var client = await GetOAuthClientAsync();
+            var uri = string.Format("https://api.500px.com/v1/photos/{0}?name={1}&description={2}&category={3}&privacy={4}", id, name, description, (int)selectedCategory, (int)selectedPrivacy);
+            foreach (var tag in tags.Split(','))
+            {
+                uri += string.Format("&tags[]={0}", tag.Trim());
+            }
+
+            var result = await client.PutAsync(uri, null);
+            return result.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> DeletePhotoAsync(int id)
+        {
+            var client = await GetOAuthClientAsync();
+            var uri = string.Format("https://api.500px.com/v1/photos/{0}", id);
+
+            var result = await client.DeleteAsync(uri);
+            return result.IsSuccessStatusCode;
         }
     }
 }

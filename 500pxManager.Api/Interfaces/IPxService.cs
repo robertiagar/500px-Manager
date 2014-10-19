@@ -19,5 +19,7 @@ namespace _500pxManager.Api.Interfaces
         Task<bool> HaveAccessTokenAsync();
         Task<IEnumerable<Photo>> GetOtherPhotosPagesForUserAsync();
         Task<IEnumerable<Photo>> GetFirstPhotosPageForUserAsync();
+        Task<bool> UpdatePhotoAsync(int id, string Name, string Description, string Tags, Category SelectedCategory, Privacy SelectedPrivacy);
+        Task<bool> DeletePhotoAsync(int id);
     }
 }

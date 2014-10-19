@@ -44,5 +44,6 @@ namespace _500pxManager.Api.Entities
         public int license_type { get; set; }
         public int converted { get; set; }
         public string image_url { get; set; }
+        public IList<string> tags { get; set; }
     }
 }

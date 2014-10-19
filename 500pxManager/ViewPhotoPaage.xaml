@@ -1,0 +1,58 @@
+﻿<Page
+    x:Class="_500pxManager.ViewPhotoPaage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:_500pxManager"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding ViewPhoto, Source={StaticResource Locator}}">
+
+    <Grid x:Name="LayoutRoot">
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Panel -->
+        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+            <TextBlock Text="{StaticResource AppName}" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
+            <TextBlock Text="edit photo details" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+        </StackPanel>
+
+        <!--TODO: Content should be placed within the following grid-->
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+            <StackPanel>
+                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Name"/>
+                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Description"/>
+                <ComboBox ItemsSource="{Binding Categories}" 
+                          SelectedItem="{Binding SelectedCategory, Converter={StaticResource StringToEnumConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          Header="Category"/>
+                <ComboBox ItemsSource="{Binding Privacies}" 
+                          SelectedItem="{Binding SelectedPrivacy, Converter={StaticResource StringToEnumConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          Header="Privacy"/>
+                <TextBox Text="{Binding Tags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Tags, separate by commas"/>
+                <TextBlock Text="{Binding Photo.iso}" Style="{StaticResource BodyTextBlockStyle}"/>
+                <TextBlock Text="{Binding Photo.aperture}" Style="{StaticResource BodyTextBlockStyle}"/>
+                <TextBlock Text="{Binding Photo.camera}" Style="{StaticResource BodyTextBlockStyle}"/>
+                <TextBlock Text="{Binding Photo.focal_length}" Style="{StaticResource BodyTextBlockStyle}"/>
+                <TextBlock Text="{Binding Photo.lens}" Style="{StaticResource BodyTextBlockStyle}"/>
+                <TextBlock Text="{Binding Photo.taken_at}" Style="{StaticResource BodyTextBlockStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Icon="Accept" Label="update" Command="{Binding UpdatePhotoCommand}"/>
+            <AppBarButton Icon="Delete" Label="delete" Command="{Binding DeletePhotoCommand}"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

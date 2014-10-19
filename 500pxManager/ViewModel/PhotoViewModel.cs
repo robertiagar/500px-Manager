@@ -1,4 +1,5 @@
 ﻿using _500pxManager.Api.Entities;
+using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +12,27 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace _500pxManager.ViewModel
 {
-    public class PhotoViewModel : IComparable
+    public class PhotoViewModel : ObservableObject, IComparable
     {
-        private Photo photo;
+        private Photo _Photo;
         public PhotoViewModel(Photo photo)
         {
-            this.photo = photo;
+            Photo = photo;
         }
 
-        public Photo Photo { get { return photo; } }
+
+        public Photo Photo
+        {
+            get { return _Photo; }
+            set
+            {
+                Set<Photo>(() => Photo, ref _Photo, value);
+            }
+        }
 
         public ImageSource Image
         {
-            get { return new BitmapImage(new Uri(photo.image_url)); }
+            get { return new BitmapImage(new Uri(_Photo.image_url)); }
         }
 
         public int CompareTo(object obj)
@@ -31,8 +40,8 @@ namespace _500pxManager.ViewModel
             var photo = obj as PhotoViewModel;
             if (photo != null)
             {
-                var objDateTime = DateTime.Parse(photo.photo.created_at);
-                var thisDateTime = DateTime.Parse(this.photo.created_at);
+                var objDateTime = DateTime.Parse(photo._Photo.created_at);
+                var thisDateTime = DateTime.Parse(this._Photo.created_at);
                 if (thisDateTime > objDateTime)
                     return -1;
                 else if (thisDateTime < objDateTime)

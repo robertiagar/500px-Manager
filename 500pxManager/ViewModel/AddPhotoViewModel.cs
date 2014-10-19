@@ -1,5 +1,4 @@
-﻿using _500pxManager.Common;
-using _500pxManager.Api.Entities;
+﻿using _500pxManager.Api.Entities;
 using _500pxManager.Api.Interfaces;
 using _500pxManager.Api.Extensions;
 using GalaSoft.MvvmLight;
@@ -23,7 +22,6 @@ namespace _500pxManager.ViewModel
     {
         private string _Name;
         private string _Description;
-        private string _Tags;
         private Privacy _SelectedPrivacy;
         private Category _SelectedCategory;
         private IStorageFile _File;
@@ -33,8 +31,8 @@ namespace _500pxManager.ViewModel
 
         public AddPhotoViewModel(IPxService pxService, IStatusBarService statusBarService)
         {
-            AddPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(() => SelectPhoto());
-            UploadPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(async () => await UploadFileAsync(), () => CanUploadFile());
+            AddPhotoCommand = new RelayCommand(() => SelectPhoto());
+            UploadPhotoCommand = new RelayCommand(async () => await UploadFileAsync(), () => CanUploadFile());
             this.pxService = pxService;
             this.statusBarService = statusBarService;
             this._SelectedPrivacy = Privacy.Public;
@@ -49,7 +47,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<string>(() => Name, ref _Name, value);
-                (AddPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
+                (AddPhotoCommand as RelayCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -62,7 +60,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<string>(() => Description, ref _Description, value);
-                (UploadPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
+                (UploadPhotoCommand as RelayCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -103,7 +101,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<IStorageFile>(() => File, ref _File, value);
-                (UploadPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
+                (UploadPhotoCommand as RelayCommand).RaiseCanExecuteChanged();
             }
         }
 

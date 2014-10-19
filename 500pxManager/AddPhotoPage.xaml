@@ -8,8 +8,18 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding AddPhoto, Source={StaticResource Locator}}">
-
-    <Grid x:Name="LayoutRoot">
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <CommonNavigationTransitionInfo IsStaggeringEnabled="True"/>
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+    <Grid x:Name="LayoutRoot"
+          ScrollViewer.IsVerticalRailEnabled="True"
+          ScrollViewer.VerticalScrollBarVisibility="Visible">
         <Grid.Background>
             <ImageBrush ImageSource="{Binding Image}" Opacity="0.45" Stretch="UniformToFill"/>
         </Grid.Background>
@@ -22,39 +32,37 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="{StaticResource AppName}" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="add photo" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock Text="{StaticResource AppName}" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <TextBlock Text="add photo" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Name"/>
-                <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"/>
-                <ComboBox Grid.Row="2" ItemsSource="{Binding Categories}"
-                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
-                              Header="Category"/>
-                <TextBlock Grid.Row="3"
-                           Text="Currently the 500px API doesn't support getting unpublished photos, so every photo you upload is public."
-                           Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
-                <Grid Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill"/>
-                    <Button Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                </Grid>
-            </Grid>
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="320"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Name"  CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"  CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <ComboBox Grid.Row="2" ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
+                      Header="Category" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <TextBlock Grid.Row="3"
+                       Text="Currently the 500px API doesn't support getting private photos, so every photo you upload is public."
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <Button Grid.Row="5" Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+            <Image Grid.Row="6" Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
         </Grid>
     </Grid>
     <Page.BottomAppBar>
