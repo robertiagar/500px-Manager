@@ -18,6 +18,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using System.Net.Http.Headers;
 using _500pxManager.Api.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace _500pxManager.Api.Services
 {
@@ -182,10 +183,59 @@ namespace _500pxManager.Api.Services
             }
         }
 
-
-        public async Task AddCollectionAsync(string CollectionName)
+        public async Task<IEnumerable<Photo>> GetOtherPhotosPagesForUserAsync()
         {
             var client = await GetOAuthClientAsync();
+            var user = await GetUserAsync();
+
+            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, 2);
+            var json = await client.GetStringAsync(uri);
+
+            JObject jsonResult = JObject.Parse(json);
+            var photosJson = jsonResult["photos"];
+            var pages = (int)jsonResult["total_pages"];
+            var currentPage = (int)jsonResult["current_page"];
+            var photos = JsonConvert.DeserializeObject<IEnumerable<Photo>>(photosJson.ToString());
+
+            var photosResult = new List<Photo>();
+            photosResult.AddRange(photos);
+            for (currentPage = 3; currentPage < pages; currentPage++)
+            {
+                uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, currentPage);
+                json = await client.GetStringAsync(uri);
+
+                jsonResult = JObject.Parse(json);
+                photosJson = jsonResult["photos"];
+                photos = JsonConvert.DeserializeObject<IEnumerable<Photo>>(photosJson.ToString());
+                photosResult.AddRange(photos);
+            }
+
+            return photosResult;
+        }
+
+        public async Task<IEnumerable<Photo>> GetFirstPhotosPageForUserAsync()
+        {
+            var client = await GetOAuthClientAsync();
+            var user = await GetUserAsync();
+
+            var uri = string.Format("https://api.500px.com/v1/photos?feature=user&username={0}&page={1}", user.username, 1);
+            var json = await client.GetStringAsync(uri);
+
+            JObject jsonResult = JObject.Parse(json);
+            var photosJson = jsonResult["photos"];
+            var pages = (int)jsonResult["total_pages"];
+            var currentPage = (int)jsonResult["current_page"];
+            var photos = JsonConvert.DeserializeObject<IEnumerable<Photo>>(photosJson.ToString());
+
+            var photosResult = new List<Photo>();
+            photosResult.AddRange(photos);
+            return photosResult;
+        }
+
+
+        public async Task<IEnumerable<Photo>> RefreshPhotosAsync()
+        {
+            return await GetFirstPhotosPageForUserAsync();
         }
     }
 }

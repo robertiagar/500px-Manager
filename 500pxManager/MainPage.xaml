@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Main,Source={StaticResource Locator}}">
     <Page.Resources>
-        
+
     </Page.Resources>
     <Page.Transitions>
         <TransitionCollection>
@@ -29,7 +29,9 @@
                 Margin="19,14.5,0,0"
                 Header="collections"
                 CommonNavigationTransitionInfo.IsStaggerElement="True">
-                --><!--Double line list with text wrapping--><!--
+                -->
+            <!--Double line list with text wrapping-->
+            <!--
                 <ListView
                     IsItemClickEnabled="True"
                     ContinuumNavigationTransitionInfo.ExitElementContainer="True">
@@ -64,25 +66,25 @@
                 <!--Double line list with text wrapping-->
                 <ListView
                     IsItemClickEnabled="True"
-                    ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+                    ContinuumNavigationTransitionInfo.ExitElementContainer="True"
+                    ItemsSource="{Binding Photos}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0,0,0,9.5">
-                                <TextBlock
-                                    Text="{Binding Title}"
-                                    TextWrapping="Wrap"
-                                    Pivot.SlideInAnimationGroup="1"
-                                    CommonNavigationTransitionInfo.IsStaggerElement="True"
-                                    Style="{ThemeResource ListViewItemTextBlockStyle}"
-                                    Margin="0,0,19,0"/>
-                                <TextBlock
-                                    Text="{Binding Description}"
-                                    TextWrapping="WrapWholeWords"
-                                    Pivot.SlideInAnimationGroup="2" 
-                                    CommonNavigationTransitionInfo.IsStaggerElement="True" 
-                                    Style="{ThemeResource ListViewItemContentTextBlockStyle}"
-                                    Margin="0,0,19,0"/>
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="400"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Height="100">
+                                    <Grid>
+                                        <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Photo.name}"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="5">
+                                    <TextBlock Text="{Binding Photo.name}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="WrapWholeWords"/>
+                                    <TextBlock Text="{Binding Photo.Category}" Style="{StaticResource BodyTextBlockStyle}" MaxHeight="60"/>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -93,8 +95,8 @@
 
     <Page.BottomAppBar>
         <CommandBar>
-            <AppBarButton Label="{Binding AddLabel}" Icon="Add" Command="{Binding AddPhotoCommand}">
-            </AppBarButton>
+            <AppBarButton Label="{Binding AddLabel}" Icon="Add" Command="{Binding AddPhotoCommand}"/>
+            <AppBarButton Label="Refresh" Icon="Refresh" Command="{Binding RefreshCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="settings" Icon="Setting"/>
             </CommandBar.SecondaryCommands>

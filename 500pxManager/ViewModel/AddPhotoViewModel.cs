@@ -1,6 +1,7 @@
 ﻿using _500pxManager.Common;
 using _500pxManager.Api.Entities;
 using _500pxManager.Api.Interfaces;
+using _500pxManager.Api.Extensions;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
@@ -22,9 +23,13 @@ namespace _500pxManager.ViewModel
     {
         private string _Name;
         private string _Description;
+        private string _Tags;
         private Privacy _SelectedPrivacy;
         private Category _SelectedCategory;
+        private IStorageFile _File;
+        private IStatusBarService statusBarService;
         private IPxService pxService;
+        private ImageSource _Image;
 
         public AddPhotoViewModel(IPxService pxService, IStatusBarService statusBarService)
         {
@@ -32,6 +37,7 @@ namespace _500pxManager.ViewModel
             UploadPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(async () => await UploadFileAsync());
             this.pxService = pxService;
             this.statusBarService = statusBarService;
+            this._SelectedPrivacy = Privacy.Public;
 
             PrivacyOptions = new ObservableCollection<string>(Enum.GetNames(typeof(Privacy)).Select(p => p.ToWords()));
             Categories = new ObservableCollection<string>(Enum.GetNames(typeof(Category)).Select(p => p.ToWords()));
@@ -89,7 +95,6 @@ namespace _500pxManager.ViewModel
         }
 
 
-        private IStorageFile _File;
         public IStorageFile File
         {
             get { return _File; }
@@ -102,13 +107,21 @@ namespace _500pxManager.ViewModel
 
         public async Task SetFileAsync(IStorageFile file)
         {
-            File = file;
-            using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+            if (file != null)
             {
-                // Set the image source to the selected bitmap 
-                BitmapImage bitmapImage = new BitmapImage();
-                await bitmapImage.SetSourceAsync(fileStream);
-                Image = bitmapImage;
+                File = file;
+                using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                {
+                    // Set the image source to the selected bitmap 
+                    BitmapImage bitmapImage = new BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+                    Image = bitmapImage;
+                }
+            }
+            else
+            {
+                File = null;
+                Image = null;
             }
         }
 
@@ -121,16 +134,18 @@ namespace _500pxManager.ViewModel
             {
                 var total = op.Progress.TotalBytesToSend;
                 var sent = op.Progress.BytesSent;
-                var percent = (sent * 100.0 )/total;
+                var percent = ((sent * 100.0 )/total)/100;
                 statusBarService.DisplayProgress(percent);
             }
             , Name, Description, SelectedPrivacy, SelectedCategory);
+            this.Name = this.Description = string.Empty;
+            this.SelectedCategory = Category.Uncategorized;
 
+            await this.SetFileAsync(null);
+            await statusBarService.DisplayMessage("Done!", 3000, false);
             await statusBarService.HideProgressAsync();
         }
 
-        private ImageSource _Image;
-        private IStatusBarService statusBarService;
         public ImageSource Image
         {
             get { return _Image; }

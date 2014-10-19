@@ -10,6 +10,9 @@
     DataContext="{Binding AddPhoto, Source={StaticResource Locator}}">
 
     <Grid x:Name="LayoutRoot">
+        <Grid.Background>
+            <ImageBrush ImageSource="{Binding Image}" Opacity="0.45" Stretch="UniformToFill"/>
+        </Grid.Background>
 
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -36,18 +39,19 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Name"/>
                 <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"/>
-                <ComboBox Grid.Row="2" ItemsSource="{Binding PrivacyOptions}"
-                              SelectedItem="{Binding SelectedPrivacy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
-                              Header="Private"/>
-                <ComboBox Grid.Row="3" ItemsSource="{Binding Categories}"
+                <ComboBox Grid.Row="2" ItemsSource="{Binding Categories}"
                               SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
                               Header="Category"/>
-                <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <TextBlock Grid.Row="3"
+                           Text="Currently the 500px API doesn't support getting unpublished photos, so every photo you upload is public."
+                           Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                <Grid Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill"/>
                     <Button Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 </Grid>
             </Grid>

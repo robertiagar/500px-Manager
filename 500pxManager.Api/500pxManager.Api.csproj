@@ -84,9 +84,11 @@
     <Compile Include="Entities\Comment.cs" />
     <Compile Include="Entities\Contacts.cs" />
     <Compile Include="Entities\Equipement.cs" />
+    <Compile Include="Entities\Feature.cs" />
     <Compile Include="Entities\Privacy.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Entities\Photo.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Interfaces\IPxService.cs" />
     <Compile Include="Interfaces\IStatusBarService.cs" />
     <Compile Include="Services\PxService.cs" />

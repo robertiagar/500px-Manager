@@ -110,8 +110,11 @@ namespace _500pxManager
 
         public async void ContinueFileOpenPicker(Windows.ApplicationModel.Activation.FileOpenPickerContinuationEventArgs args)
         {
-            var file = args.Files.First();
-            await DefaultViewModel.SetFileAsync(file);
+            if (args.Files.Count != 0)
+            {
+                var file = args.Files.First();
+                await DefaultViewModel.SetFileAsync(file);
+            }
         }
     }
 }

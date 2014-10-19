@@ -51,5 +51,23 @@ namespace _500pxManager.Api.Services
             await statusBar.ProgressIndicator.HideAsync();
             statusBar.ProgressIndicator.ProgressValue = null;
         }
+
+
+        public async Task DisplayMessage(string message, int delay)
+        {
+            statusBar.ProgressIndicator.Text = message;
+            await Task.Delay(delay);
+        }
+
+
+        public async Task DisplayMessage(string messsage, int delay, bool displayProgressBar = true)
+        {
+            if (!displayProgressBar)
+            {
+                statusBar.ProgressIndicator.ProgressValue = 0;
+            }
+            statusBar.ProgressIndicator.Text = messsage;
+            await Task.Delay(delay);
+        }
     }
 }

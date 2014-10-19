@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace _500pxManager.Common
+namespace _500pxManager.Api.Extensions
 {
     public static class Extensions
     {

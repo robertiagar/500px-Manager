@@ -17,5 +17,7 @@ namespace _500pxManager.Api.Interfaces
         Task UploadPhotoAsync(IStorageFile file, Action<UploadOperation> progressAction, string name, string description, Privacy privacy, Category category);
         Task UploadPhotosAsync(IEnumerable<StorageFile> files, Action<UploadOperation> progressAction);
         Task<bool> HaveAccessTokenAsync();
+        Task<IEnumerable<Photo>> GetOtherPhotosPagesForUserAsync();
+        Task<IEnumerable<Photo>> GetFirstPhotosPageForUserAsync();
     }
 }

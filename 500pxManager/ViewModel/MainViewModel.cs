@@ -1,9 +1,14 @@
-using _500pxManager.Api.Interfaces;
+﻿using _500pxManager.Api.Interfaces;
 using _500pxManager.Interfaces;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Windows.Input;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
@@ -15,13 +20,20 @@ namespace _500pxManager.ViewModel
         private int _SelectedIndex;
         private string _AddLabel;
         private INavigationService navigationService;
+        private IList<PhotoViewModel> photos;
+        private IPxService pxService;
+        private IStatusBarService statusBarService;
 
-        public MainViewModel(INavigationService navigationService)
+        public MainViewModel(INavigationService navigationService, IPxService pxService, IStatusBarService statusBarService)
         {
             SelectedIndex = 0;
             AddLabel = "add photo";
             this.navigationService = navigationService;
             this.AddPhotoCommand = new RelayCommand(() => NavigateToAddPhoto());
+            this.RefreshCommand = new RelayCommand(async () => await RefreshAsync());
+            this.photos = new ObservableCollection<PhotoViewModel>();
+            this.pxService = pxService;
+            this.statusBarService = statusBarService;
         }
 
         public int SelectedIndex
@@ -33,9 +45,9 @@ namespace _500pxManager.ViewModel
                 switch (value)
                 {
                     case 0:
-                        //AddLabel = "add collection";
-                        //Flyout = App.Current.Resources["AddCollectionFlyout"] as Flyout;
-                        //break;
+                    //AddLabel = "add collection";
+                    //Flyout = App.Current.Resources["AddCollectionFlyout"] as Flyout;
+                    //break;
                     case 1:
                         AddLabel = "add photo";
                         break;
@@ -43,7 +55,13 @@ namespace _500pxManager.ViewModel
             }
         }
 
+        public IList<PhotoViewModel> Photos
+        {
+            get { return photos; }
+        }
+
         public ICommand AddPhotoCommand { get; private set; }
+        public ICommand RefreshCommand { get; private set; }
 
         public string AddLabel
         {
@@ -57,6 +75,69 @@ namespace _500pxManager.ViewModel
         private void NavigateToAddPhoto()
         {
             navigationService.Navigate(typeof(AddPhotoPage));
+        }
+
+        public async Task GetPhotosAsync()
+        {
+            if (Photos.Count != 0)
+            {
+                await RefreshAsync();
+            }
+            else
+            {
+                statusBarService.DisplayMessage("Getting photos...");
+                await statusBarService.ShowProgressAsync();
+                var photos = await pxService.GetFirstPhotosPageForUserAsync();
+                var list = photos.Select(p => new PhotoViewModel(p));
+                foreach (var photo in list)
+                {
+                    Photos.Add(photo);
+                }
+
+                photos = await pxService.GetOtherPhotosPagesForUserAsync();
+                list = photos.Select(p => new PhotoViewModel(p));
+                foreach (var photo in list)
+                {
+                    Photos.Add(photo);
+                }
+            }
+            await statusBarService.DisplayMessage("Done!", 3000, false);
+            await statusBarService.HideProgressAsync();
+        }
+
+        public async Task RefreshAsync()
+        {
+            statusBarService.DisplayMessage("Refreshing...");
+            await statusBarService.ShowProgressAsync();
+            var photos = await pxService.GetFirstPhotosPageForUserAsync();
+            foreach (var photo in photos)
+            {
+                var exists = Photos.Any(p => p.Photo.id == photo.id);
+                if (!exists)
+                {
+                    var photoViewModel = new PhotoViewModel(photo);
+                    var list = Photos.ToList();
+                    int index = list.BinarySearch(photoViewModel);
+                    int insertIndex = ~index;
+                    Photos.Insert(insertIndex, photoViewModel);
+                }
+            }
+
+            photos = await pxService.GetOtherPhotosPagesForUserAsync();
+            foreach (var photo in photos)
+            {
+                var exists = Photos.Any(p => p.Photo.id == photo.id);
+                if (!exists)
+                {
+                    var photoViewModel = new PhotoViewModel(photo);
+                    var list = Photos.ToList();
+                    int index = list.BinarySearch(photoViewModel);
+                    int insertIndex = ~index;
+                    Photos.Insert(insertIndex, photoViewModel);
+                }
+            }
+            await statusBarService.DisplayMessage("Done!", 3000, false);
+            await statusBarService.HideProgressAsync();
         }
     }
 }
