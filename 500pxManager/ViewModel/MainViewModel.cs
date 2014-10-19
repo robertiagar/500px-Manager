@@ -12,6 +12,8 @@ using System.Linq.Expressions;
 using System.Windows.Input;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
+using Windows.Networking.Connectivity;
+using System;
 
 namespace _500pxManager.ViewModel
 {
@@ -79,65 +81,95 @@ namespace _500pxManager.ViewModel
 
         public async Task GetPhotosAsync()
         {
-            if (Photos.Count != 0)
+            var hasInternet = await HasInternetAsync();
+            if (hasInternet)
             {
-                await RefreshAsync();
-            }
-            else
-            {
-                statusBarService.DisplayMessage("Getting photos...");
-                await statusBarService.ShowProgressAsync();
-                var photos = await pxService.GetFirstPhotosPageForUserAsync();
-                var list = photos.Select(p => new PhotoViewModel(p));
-                foreach (var photo in list)
+                if (Photos.Count != 0)
                 {
-                    Photos.Add(photo);
+                    await RefreshAsync();
                 }
+                else
+                {
+                    statusBarService.DisplayMessage("Getting photos...");
+                    await statusBarService.ShowProgressAsync();
+                    var photos = await pxService.GetFirstPhotosPageForUserAsync();
+                    var list = photos.Select(p => new PhotoViewModel(p));
+                    foreach (var photo in list)
+                    {
+                        Photos.Add(photo);
+                    }
 
-                photos = await pxService.GetOtherPhotosPagesForUserAsync();
-                list = photos.Select(p => new PhotoViewModel(p));
-                foreach (var photo in list)
-                {
-                    Photos.Add(photo);
+                    photos = await pxService.GetOtherPhotosPagesForUserAsync();
+                    list = photos.Select(p => new PhotoViewModel(p));
+                    foreach (var photo in list)
+                    {
+                        Photos.Add(photo);
+                    }
                 }
+                await statusBarService.DisplayMessage("Done!", 3000, false);
+                await statusBarService.HideProgressAsync();
             }
-            await statusBarService.DisplayMessage("Done!", 3000, false);
-            await statusBarService.HideProgressAsync();
         }
 
         public async Task RefreshAsync()
         {
-            statusBarService.DisplayMessage("Refreshing...");
-            await statusBarService.ShowProgressAsync();
-            var photos = await pxService.GetFirstPhotosPageForUserAsync();
-            foreach (var photo in photos)
+            var hasInternet = await HasInternetAsync();
+            if (hasInternet)
             {
-                var exists = Photos.Any(p => p.Photo.id == photo.id);
-                if (!exists)
+                statusBarService.DisplayMessage("Refreshing...");
+                await statusBarService.ShowProgressAsync();
+                var photos = await pxService.GetFirstPhotosPageForUserAsync();
+                foreach (var photo in photos)
                 {
-                    var photoViewModel = new PhotoViewModel(photo);
-                    var list = Photos.ToList();
-                    int index = list.BinarySearch(photoViewModel);
-                    int insertIndex = ~index;
-                    Photos.Insert(insertIndex, photoViewModel);
+                    var exists = Photos.Any(p => p.Photo.id == photo.id);
+                    if (!exists)
+                    {
+                        var photoViewModel = new PhotoViewModel(photo);
+                        var list = Photos.ToList();
+                        int index = list.BinarySearch(photoViewModel);
+                        int insertIndex = ~index;
+                        Photos.Insert(insertIndex, photoViewModel);
+                    }
                 }
+
+                photos = await pxService.GetOtherPhotosPagesForUserAsync();
+                foreach (var photo in photos)
+                {
+                    var exists = Photos.Any(p => p.Photo.id == photo.id);
+                    if (!exists)
+                    {
+                        var photoViewModel = new PhotoViewModel(photo);
+                        var list = Photos.ToList();
+                        int index = list.BinarySearch(photoViewModel);
+                        int insertIndex = ~index;
+                        Photos.Insert(insertIndex, photoViewModel);
+                    }
+                }
+                await statusBarService.DisplayMessage("Done!", 3000, false);
+                await statusBarService.HideProgressAsync();
+            }
+        }
+
+        public async Task<bool> HasInternetAsync()
+        {
+            string connectionProfileInfo = string.Empty;
+            try
+            {
+                ConnectionProfile InternetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
+
+                if (InternetConnectionProfile == null)
+                {
+                    statusBarService.DisplayMessage("Offline", false);
+                    await statusBarService.ShowProgressAsync();
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
             }
 
-            photos = await pxService.GetOtherPhotosPagesForUserAsync();
-            foreach (var photo in photos)
-            {
-                var exists = Photos.Any(p => p.Photo.id == photo.id);
-                if (!exists)
-                {
-                    var photoViewModel = new PhotoViewModel(photo);
-                    var list = Photos.ToList();
-                    int index = list.BinarySearch(photoViewModel);
-                    int insertIndex = ~index;
-                    Photos.Insert(insertIndex, photoViewModel);
-                }
-            }
-            await statusBarService.DisplayMessage("Done!", 3000, false);
-            await statusBarService.HideProgressAsync();
+            return true;
         }
     }
 }

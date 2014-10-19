@@ -34,7 +34,7 @@ namespace _500pxManager.ViewModel
         public AddPhotoViewModel(IPxService pxService, IStatusBarService statusBarService)
         {
             AddPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(() => SelectPhoto());
-            UploadPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(async () => await UploadFileAsync());
+            UploadPhotoCommand = new GalaSoft.MvvmLight.Command.RelayCommand(async () => await UploadFileAsync(), () => CanUploadFile());
             this.pxService = pxService;
             this.statusBarService = statusBarService;
             this._SelectedPrivacy = Privacy.Public;
@@ -49,6 +49,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<string>(() => Name, ref _Name, value);
+                (AddPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -61,6 +62,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<string>(() => Description, ref _Description, value);
+                (UploadPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -101,6 +103,7 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<IStorageFile>(() => File, ref _File, value);
+                (UploadPhotoCommand as GalaSoft.MvvmLight.Command.RelayCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -134,7 +137,7 @@ namespace _500pxManager.ViewModel
             {
                 var total = op.Progress.TotalBytesToSend;
                 var sent = op.Progress.BytesSent;
-                var percent = ((sent * 100.0 )/total)/100;
+                var percent = ((sent * 100.0) / total) / 100;
                 statusBarService.DisplayProgress(percent);
             }
             , Name, Description, SelectedPrivacy, SelectedCategory);
@@ -144,6 +147,15 @@ namespace _500pxManager.ViewModel
             await this.SetFileAsync(null);
             await statusBarService.DisplayMessage("Done!", 3000, false);
             await statusBarService.HideProgressAsync();
+        }
+
+        private bool CanUploadFile()
+        {
+            if (File != null && !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description))
+            {
+                return true;
+            }
+            return false;
         }
 
         public ImageSource Image

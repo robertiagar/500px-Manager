@@ -69,5 +69,15 @@ namespace _500pxManager.Api.Services
             statusBar.ProgressIndicator.Text = messsage;
             await Task.Delay(delay);
         }
+
+
+        public void DisplayMessage(string message, bool displayProgressBar = false)
+        {
+            if (!displayProgressBar)
+            {
+                statusBar.ProgressIndicator.ProgressValue = 0;
+            }
+            statusBar.ProgressIndicator.Text = message;
+        }
     }
 }
