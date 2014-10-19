@@ -1,5 +1,6 @@
 ﻿using _500pxManager.Common;
 using _500pxManager.Interfaces;
+using _500pxManager.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.DataTransfer.ShareTarget;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -42,6 +45,13 @@ namespace _500pxManager
             this.Suspending += this.OnSuspending;
         }
 
+        protected override async void OnShareTargetActivated(ShareTargetActivatedEventArgs args)
+        {
+            var rootFrame = new Frame();
+            rootFrame.Navigate(typeof(AddPhotoPage), args.ShareOperation);
+            Window.Current.Content = rootFrame;
+            Window.Current.Activate();
+        }
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -125,9 +135,9 @@ namespace _500pxManager
             var continuationEventArgs = e as IContinuationActivatedEventArgs;
             if (continuationEventArgs != null)
             {
-                
-                    // Call ContinuationManager to handle continuation activation
-                    continuationManager.Continue(continuationEventArgs);
+
+                // Call ContinuationManager to handle continuation activation
+                continuationManager.Continue(continuationEventArgs);
             }
 
             Window.Current.Activate();

@@ -15,6 +15,8 @@ using Windows.Storage;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
+using Windows.ApplicationModel.DataTransfer.ShareTarget;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace _500pxManager.ViewModel
 {
@@ -28,6 +30,7 @@ namespace _500pxManager.ViewModel
         private IStatusBarService statusBarService;
         private IPxService pxService;
         private ImageSource _Image;
+        private ShareOperation _shareOperation = null;
 
         public AddPhotoViewModel(IPxService pxService, IStatusBarService statusBarService)
         {
@@ -145,6 +148,12 @@ namespace _500pxManager.ViewModel
             await this.SetFileAsync(null);
             await statusBarService.DisplayMessage("Done!", 3000, false);
             await statusBarService.HideProgressAsync();
+            if (_shareOperation != null)
+            {
+                _shareOperation.ReportCompleted();
+                _shareOperation = null;
+                App.Current.Exit();
+            }
         }
 
         private bool CanUploadFile()
@@ -162,6 +171,19 @@ namespace _500pxManager.ViewModel
             set
             {
                 Set<ImageSource>(() => Image, ref _Image, value);
+            }
+        }
+
+        public async Task ReceivedFile(ShareOperation shareOperation)
+        {
+            _shareOperation = shareOperation;
+            _shareOperation.ReportStarted();
+            if (_shareOperation.Data.Contains(StandardDataFormats.StorageItems))
+            {
+                var sharedStorageItems = await _shareOperation.Data.GetStorageItemsAsync();
+                this._shareOperation.ReportDataRetrieved();
+                var file = await StorageFile.GetFileFromPathAsync(sharedStorageItems[0].Path);
+                await SetFileAsync(file);
             }
         }
     }

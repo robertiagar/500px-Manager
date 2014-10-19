@@ -53,15 +53,15 @@
                 <RowDefinition Height="320"/>
             </Grid.RowDefinitions>
             <TextBox Grid.Row="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Name"  CommonNavigationTransitionInfo.IsStaggerElement="True"/>
-            <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"  CommonNavigationTransitionInfo.IsStaggerElement="True"/>
-            <ComboBox Grid.Row="2" ItemsSource="{Binding Categories}"
-                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
-                      Header="Category" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
-            <TextBlock Grid.Row="3"
-                       Text="Currently the 500px API doesn't support getting private photos, so every photo you upload is public."
-                       Style="{StaticResource BodyTextBlockStyle}"
-                       CommonNavigationTransitionInfo.IsStaggerElement="True"/>
-            <Button Grid.Row="5" Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                <TextBox Grid.Row="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="Photo Description"  CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                <ComboBox Grid.Row="2" ItemsSource="{Binding Categories}"
+                          SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToEnumConverter}}"
+                          Header="Category" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                <TextBlock Grid.Row="3"
+                           Text="Currently the 500px API doesn't support getting private photos, so every photo you upload is public."
+                           Style="{StaticResource BodyTextBlockStyle}"
+                           CommonNavigationTransitionInfo.IsStaggerElement="True"/>
+                <Button Grid.Row="5" Content="add photo" Command="{Binding AddPhotoCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
             <Image Grid.Row="6" Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" CommonNavigationTransitionInfo.IsStaggerElement="True"/>
         </Grid>
     </Grid>

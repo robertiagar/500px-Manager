@@ -5,9 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.ApplicationModel.DataTransfer.ShareTarget;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -65,8 +68,17 @@ namespace _500pxManager
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            var shareOperation = (ShareOperation)e.NavigationParameter;
+            shareOperation.ReportStarted();
+            if (shareOperation.Data.Contains(StandardDataFormats.StorageItems))
+            {
+                var sharedStorageItems = await shareOperation.Data.GetStorageItemsAsync();
+                shareOperation.ReportDataRetrieved();
+                var file = await StorageFile.GetFileFromPathAsync(sharedStorageItems[0].Path);
+                await DefaultViewModel.SetFileAsync(file);
+            }
         }
 
         /// <summary>
