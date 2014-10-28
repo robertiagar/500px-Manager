@@ -67,6 +67,7 @@
                 <ListView
                     IsItemClickEnabled="True"
                     ContinuumNavigationTransitionInfo.ExitElementContainer="True"
+                    ContinuumNavigationTransitionInfo.IsEntranceElement="True"
                     ItemsSource="{Binding Photos}"
                     ItemClick="ListView_ItemClick">
                     <ListView.ItemTemplate>

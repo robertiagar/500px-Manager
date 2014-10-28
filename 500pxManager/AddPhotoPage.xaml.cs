@@ -70,14 +70,17 @@ namespace _500pxManager
         /// session.  The state will be null the first time a page is visited.</param>
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            var shareOperation = (ShareOperation)e.NavigationParameter;
-            shareOperation.ReportStarted();
-            if (shareOperation.Data.Contains(StandardDataFormats.StorageItems))
+            if (e.NavigationParameter != null)
             {
-                var sharedStorageItems = await shareOperation.Data.GetStorageItemsAsync();
-                shareOperation.ReportDataRetrieved();
-                var file = await StorageFile.GetFileFromPathAsync(sharedStorageItems[0].Path);
-                await DefaultViewModel.SetFileAsync(file);
+                var shareOperation = (ShareOperation)e.NavigationParameter;
+                shareOperation.ReportStarted();
+                if (shareOperation.Data.Contains(StandardDataFormats.StorageItems))
+                {
+                    var sharedStorageItems = await shareOperation.Data.GetStorageItemsAsync();
+                    shareOperation.ReportDataRetrieved();
+                    var file = await StorageFile.GetFileFromPathAsync(sharedStorageItems[0].Path);
+                    await DefaultViewModel.SetFileAsync(file);
+                }
             }
         }
 
